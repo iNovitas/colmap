@@ -896,7 +896,7 @@ ExhaustiveFeatureMatcher::ExhaustiveFeatureMatcher(
 }
 
 void ExhaustiveFeatureMatcher::Run() {
-  PrintHeading1("Exhaustive feature matching");
+  // PrintHeading1("Exhaustive feature matching");
 
   if (!matcher_.Setup()) {
     return;
@@ -931,10 +931,10 @@ void ExhaustiveFeatureMatcher::Run() {
       Timer timer;
       timer.Start();
 
-      std::cout << StringPrintf("Matching block [%d/%d, %d/%d]",
-                                start_idx1 / block_size + 1, num_blocks,
-                                start_idx2 / block_size + 1, num_blocks)
-                << std::flush;
+      // std::cout << StringPrintf("Matching block [%d/%d, %d/%d]",
+      //                           start_idx1 / block_size + 1, num_blocks,
+      //                           start_idx2 / block_size + 1, num_blocks)
+      //           << std::flush;
 
       image_pairs.clear();
       for (size_t idx1 = start_idx1; idx1 <= end_idx1; ++idx1) {
@@ -952,11 +952,11 @@ void ExhaustiveFeatureMatcher::Run() {
       DatabaseTransaction database_transaction(&database_);
       matcher_.Match(image_pairs);
 
-      PrintElapsedTime(timer);
+      // PrintElapsedTime(timer);
     }
   }
 
-  GetTimer().PrintMinutes();
+  // GetTimer().PrintMinutes();
 }
 
 SequentialFeatureMatcher::SequentialFeatureMatcher(

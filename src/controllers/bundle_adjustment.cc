@@ -69,7 +69,7 @@ BundleAdjustmentController::BundleAdjustmentController(
 void BundleAdjustmentController::Run() {
   CHECK_NOTNULL(reconstruction_);
 
-  PrintHeading1("Global bundle adjustment");
+  // PrintHeading1("Global bundle adjustment");
 
   const std::vector<image_t>& reg_image_ids = reconstruction_->RegImageIds();
 
@@ -82,7 +82,7 @@ void BundleAdjustmentController::Run() {
   reconstruction_->FilterObservationsWithNegativeDepth();
 
   BundleAdjustmentOptions ba_options = *options_.bundle_adjustment;
-  ba_options.solver_options.minimizer_progress_to_stdout = true;
+  ba_options.solver_options.minimizer_progress_to_stdout = false;
 
   BundleAdjustmentIterationCallback iteration_callback(this);
   ba_options.solver_options.callbacks.push_back(&iteration_callback);
@@ -99,7 +99,7 @@ void BundleAdjustmentController::Run() {
   BundleAdjuster bundle_adjuster(ba_options, ba_config);
   bundle_adjuster.Solve(reconstruction_);
 
-  GetTimer().PrintMinutes();
+  // GetTimer().PrintMinutes();
 }
 
 }  // namespace colmap

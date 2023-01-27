@@ -62,7 +62,7 @@ void DatabaseCache::Load(const Database& database, const size_t min_num_matches,
   Timer timer;
 
   timer.Start();
-  std::cout << "Loading cameras..." << std::flush;
+  // std::cout << "Loading cameras..." << std::flush;
 
   {
     const std::vector<class Camera> cameras = database.ReadAllCameras();
@@ -72,24 +72,24 @@ void DatabaseCache::Load(const Database& database, const size_t min_num_matches,
     }
   }
 
-  std::cout << StringPrintf(" %d in %.3fs", cameras_.size(),
-                            timer.ElapsedSeconds())
-            << std::endl;
+  // std::cout << StringPrintf(" %d in %.3fs", cameras_.size(),
+  //                           timer.ElapsedSeconds())
+  //           << std::endl;
 
   //////////////////////////////////////////////////////////////////////////////
   // Load matches
   //////////////////////////////////////////////////////////////////////////////
 
   timer.Restart();
-  std::cout << "Loading matches..." << std::flush;
+  // std::cout << "Loading matches..." << std::flush;
 
   std::vector<image_pair_t> image_pair_ids;
   std::vector<TwoViewGeometry> two_view_geometries;
   database.ReadTwoViewGeometries(&image_pair_ids, &two_view_geometries);
 
-  std::cout << StringPrintf(" %d in %.3fs", image_pair_ids.size(),
-                            timer.ElapsedSeconds())
-            << std::endl;
+  // std::cout << StringPrintf(" %d in %.3fs", image_pair_ids.size(),
+  //                           timer.ElapsedSeconds())
+  //           << std::endl;
 
   auto UseInlierMatchesCheck = [min_num_matches, ignore_watermarks](
                                    const TwoViewGeometry& two_view_geometry) {
@@ -104,7 +104,7 @@ void DatabaseCache::Load(const Database& database, const size_t min_num_matches,
   //////////////////////////////////////////////////////////////////////////////
 
   timer.Restart();
-  std::cout << "Loading images..." << std::flush;
+  // std::cout << "Loading images..." << std::flush;
 
   std::unordered_set<image_t> image_ids;
 
@@ -154,10 +154,10 @@ void DatabaseCache::Load(const Database& database, const size_t min_num_matches,
       }
     }
 
-    std::cout << StringPrintf(" %d in %.3fs (connected %d)", images.size(),
-                              timer.ElapsedSeconds(),
-                              connected_image_ids.size())
-              << std::endl;
+    // std::cout << StringPrintf(" %d in %.3fs (connected %d)", images.size(),
+    //                           timer.ElapsedSeconds(),
+    //                           connected_image_ids.size())
+    //           << std::endl;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -165,7 +165,7 @@ void DatabaseCache::Load(const Database& database, const size_t min_num_matches,
   //////////////////////////////////////////////////////////////////////////////
 
   timer.Restart();
-  std::cout << "Building correspondence graph..." << std::flush;
+  // std::cout << "Building correspondence graph..." << std::flush;
 
   for (const auto& image : images_) {
     correspondence_graph_.AddImage(image.first, image.second.NumPoints2D());
@@ -198,9 +198,9 @@ void DatabaseCache::Load(const Database& database, const size_t min_num_matches,
         correspondence_graph_.NumCorrespondencesForImage(image.first));
   }
 
-  std::cout << StringPrintf(" in %.3fs (ignored %d)", timer.ElapsedSeconds(),
-                            num_ignored_image_pairs)
-            << std::endl;
+  // std::cout << StringPrintf(" in %.3fs (ignored %d)", timer.ElapsedSeconds(),
+  //                           num_ignored_image_pairs)
+  //           << std::endl;
 }
 
 const class Image* DatabaseCache::FindImageWithName(

@@ -35,6 +35,7 @@
 #include "base/undistortion.h"
 #include "controllers/incremental_mapper.h"
 #include "sfm/incremental_mapper.h"
+#include "util/globals.h"
 #include "util/misc.h"
 #include "util/option_manager.h"
 
@@ -236,6 +237,10 @@ int RunImageRectifier(int argc, char** argv) {
   return EXIT_SUCCESS;
 }
 
+// define global variables
+std::string output_path_pose_std;
+uint32_t image_id_pose_std;
+
 int RunImageRegistrator(int argc, char** argv) {
   std::string input_path;
   std::string output_path;
@@ -256,6 +261,9 @@ int RunImageRegistrator(int argc, char** argv) {
     std::cerr << "ERROR: `output_path` is not a directory" << std::endl;
     return EXIT_FAILURE;
   }
+
+  // set global varible output_path
+  output_path_pose_std = output_path;
 
   PrintHeading1("Loading database");
 
@@ -295,6 +303,9 @@ int RunImageRegistrator(int argc, char** argv) {
     std::cout << "  => Image sees " << image.second.NumVisiblePoints3D()
               << " / " << image.second.NumObservations() << " points"
               << std::endl;
+
+    // set global varible image_id
+    image_id_pose_std = image.first;
 
     mapper.RegisterNextImage(mapper_options, image.first);
   }

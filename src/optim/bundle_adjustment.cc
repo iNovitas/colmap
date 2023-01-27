@@ -272,7 +272,7 @@ bool BundleAdjuster::Solve(Reconstruction* reconstruction) {
   const bool has_sparse =
       solver_options.sparse_linear_algebra_library_type != ceres::NO_SPARSE;
 
-  // Empirical choice.
+  // Empirical choice. Default 50 --> According to Stefan Cavegn  70
   const size_t kMaxNumImagesDirectDenseSolver = 50;
   const size_t kMaxNumImagesDirectSparseSolver = 1000;
   const size_t num_images = config_.NumImages();
@@ -313,6 +313,19 @@ bool BundleAdjuster::Solve(Reconstruction* reconstruction) {
     PrintHeading2("Bundle adjustment report");
     PrintSolverSummary(summary_);
   }
+
+  // Compute covariance matrices for tvec an qvec
+  //
+  // Use structure according to Stefan Cavegn for iteration over each image in
+  // model
+  // https://github.com/FHNW-IVGI/BIMAGE-IBGeoref/commit/c3cfdfaa2aea3b75662272f266a6d138ef05d576#diff-c4ea901c5b9d716cc7f40eb47ae3baebec0d19d9a6aa7b0009c3b13cd04f4d0fR291
+  //
+  // and implement calculation of covariance matrices of tvec and qvec
+  // https://github.com/iNovitas/colmap/commit/07e4f504ecf0b5fac22a94dac6efd7f662a0b9c5
+  //
+  // and store calculated standard deviations to file
+  // https://github.com/iNovitas/colmap/commit/adbe94f73b6a81b03441c7b16601329e640fe9c9
+  //
 
   TearDown(reconstruction);
 
@@ -357,6 +370,9 @@ void BundleAdjuster::AddImageToProblem(const image_t image_id,
   double* qvec_data = image.Qvec().data();
   double* tvec_data = image.Tvec().data();
   double* camera_params_data = camera.ParamsData();
+
+  // Fill tvec and qvec data into variables according to:
+  // https://github.com/FHNW-IVGI/BIMAGE-IBGeoref/commit/c3cfdfaa2aea3b75662272f266a6d138ef05d576#diff-c4ea901c5b9d716cc7f40eb47ae3baebec0d19d9a6aa7b0009c3b13cd04f4d0fR354
 
   const bool constant_pose =
       !options_.refine_extrinsics || config_.HasConstantPose(image_id);

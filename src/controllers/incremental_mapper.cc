@@ -162,8 +162,8 @@ size_t FilterPoints(const IncrementalMapperOptions& options,
                     IncrementalMapper* mapper) {
   const size_t num_filtered_observations =
       mapper->FilterPoints(options.Mapper());
-  std::cout << "  => Filtered observations: " << num_filtered_observations
-            << std::endl;
+  // std::cout << "  => Filtered observations: " << num_filtered_observations
+  //          << std::endl;
   return num_filtered_observations;
 }
 
@@ -178,12 +178,12 @@ size_t CompleteAndMergeTracks(const IncrementalMapperOptions& options,
                               IncrementalMapper* mapper) {
   const size_t num_completed_observations =
       mapper->CompleteTracks(options.Triangulation());
-  std::cout << "  => Completed observations: " << num_completed_observations
-            << std::endl;
+  // std::cout << "  => Completed observations: " << num_completed_observations
+  //          << std::endl;
   const size_t num_merged_observations =
       mapper->MergeTracks(options.Triangulation());
-  std::cout << "  => Merged observations: " << num_merged_observations
-            << std::endl;
+  // std::cout << "  => Merged observations: " << num_merged_observations
+  //          << std::endl;
   return num_completed_observations + num_merged_observations;
 }
 
@@ -222,7 +222,7 @@ BundleAdjustmentOptions IncrementalMapperOptions::LocalBundleAdjustment()
 #if CERES_VERSION_MAJOR < 2
   options.solver_options.num_linear_solver_threads = num_threads;
 #endif  // CERES_VERSION_MAJOR
-  options.print_summary = true;
+  options.print_summary = false;
   options.refine_focal_length = ba_refine_focal_length;
   options.refine_principal_point = ba_refine_principal_point;
   options.refine_extra_params = ba_refine_extra_params;
@@ -242,12 +242,12 @@ BundleAdjustmentOptions IncrementalMapperOptions::GlobalBundleAdjustment()
   options.solver_options.parameter_tolerance = 0.0;
   options.solver_options.max_num_iterations = ba_global_max_num_iterations;
   options.solver_options.max_linear_solver_iterations = 100;
-  options.solver_options.minimizer_progress_to_stdout = true;
+  options.solver_options.minimizer_progress_to_stdout = false;
   options.solver_options.num_threads = num_threads;
 #if CERES_VERSION_MAJOR < 2
   options.solver_options.num_linear_solver_threads = num_threads;
 #endif  // CERES_VERSION_MAJOR
-  options.print_summary = true;
+  options.print_summary = false;
   options.refine_focal_length = ba_refine_focal_length;
   options.refine_principal_point = ba_refine_principal_point;
   options.refine_extra_params = ba_refine_extra_params;
@@ -262,7 +262,7 @@ ParallelBundleAdjuster::Options
 IncrementalMapperOptions::ParallelGlobalBundleAdjustment() const {
   ParallelBundleAdjuster::Options options;
   options.max_num_iterations = ba_global_max_num_iterations;
-  options.print_summary = true;
+  options.print_summary = false;
   options.gpu_index = ba_global_pba_gpu_index;
   options.num_threads = num_threads;
   options.min_num_residuals_for_multi_threading =
