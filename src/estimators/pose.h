@@ -32,6 +32,8 @@
 #ifndef COLMAP_SRC_ESTIMATORS_POSE_H_
 #define COLMAP_SRC_ESTIMATORS_POSE_H_
 
+#include <fstream>
+#include <iostream>
 #include <vector>
 
 #include <Eigen/Core>
@@ -42,6 +44,7 @@
 #include "base/camera_models.h"
 #include "optim/loransac.h"
 #include "util/alignment.h"
+#include "util/globals.h"
 #include "util/logging.h"
 #include "util/threading.h"
 #include "util/types.h"

@@ -36,6 +36,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
+#include "util/globals.h"
 #include "base/similarity_transform.h"
 #include "controllers/automatic_reconstruction.h"
 #include "controllers/bundle_adjustment.h"
@@ -52,6 +53,8 @@
 #include "util/version.h"
 
 using namespace colmap;
+std::string colmap::output_path_pose_std;
+uint32_t colmap::image_id_pose_std;
 
 #ifdef CUDA_ENABLED
 const bool kUseOpenGL = false;
@@ -59,35 +62,37 @@ const bool kUseOpenGL = false;
 const bool kUseOpenGL = true;
 #endif
 
-int RunGraphicalUserInterface(int argc, char** argv) {
-  OptionManager options;
+namespace colmap {
 
-  std::string import_path;
-
-  if (argc > 1) {
-    options.AddDefaultOption("import_path", &import_path);
-    options.AddAllOptions();
-    options.Parse(argc, argv);
-  }
-
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
-  QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-  QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-#endif
-
-  Q_INIT_RESOURCE(resources);
-
-  QApplication app(argc, argv);
-
-  MainWindow main_window(options);
-  main_window.show();
-
-  if (!import_path.empty()) {
-    main_window.ImportReconstruction(import_path);
-  }
-
-  return app.exec();
-}
+//int RunGraphicalUserInterface(int argc, char** argv) {
+//  OptionManager options;
+//
+//  std::string import_path;
+//
+//  if (argc > 1) {
+//    options.AddDefaultOption("import_path", &import_path);
+//    options.AddAllOptions();
+//    options.Parse(argc, argv);
+//  }
+//
+//#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
+//  QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+//  QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+//#endif
+//
+//  Q_INIT_RESOURCE(resources);
+//
+//  QApplication app(argc, argv);
+//
+//  MainWindow main_window(options);
+//  main_window.show();
+//
+//  if (!import_path.empty()) {
+//    main_window.ImportReconstruction(import_path);
+//  }
+//
+//  return app.exec();
+//}
 
 int RunAutomaticReconstructor(int argc, char** argv) {
   AutomaticReconstructionController::Options reconstruction_options;
@@ -771,6 +776,9 @@ int RunImageRegistrator(int argc, char** argv) {
     return EXIT_FAILURE;
   }
 
+  // set global varible output_path
+  output_path_pose_std = output_path;
+
   PrintHeading1("Loading database");
 
   DatabaseCache database_cache;
@@ -809,6 +817,9 @@ int RunImageRegistrator(int argc, char** argv) {
     std::cout << "  => Image sees " << image.second.NumVisiblePoints3D()
               << " / " << image.second.NumObservations() << " points"
               << std::endl;
+
+    // set global varible image_id
+    image_id_pose_std = image.first;
 
     mapper.RegisterNextImage(mapper_options, image.first);
   }
@@ -2107,11 +2118,13 @@ int ShowHelp(
   return EXIT_SUCCESS;
 }
 
+}  // namespace colmap
+
 int main(int argc, char** argv) {
   InitializeGlog(argv);
 
   std::vector<std::pair<std::string, command_func_t>> commands;
-  commands.emplace_back("gui", &RunGraphicalUserInterface);
+  //commands.emplace_back("gui", &RunGraphicalUserInterface);
   commands.emplace_back("automatic_reconstructor", &RunAutomaticReconstructor);
   commands.emplace_back("bundle_adjuster", &RunBundleAdjuster);
   commands.emplace_back("color_extractor", &RunColorExtractor);

@@ -38,6 +38,7 @@
 #include "estimators/absolute_pose.h"
 #include "estimators/essential_matrix.h"
 #include "optim/bundle_adjustment.h"
+#include "util/globals.h"
 #include "util/matrix.h"
 #include "util/misc.h"
 #include "util/threading.h"
@@ -303,6 +304,40 @@ bool RefineAbsolutePose(const AbsolutePoseRefinementOptions& options,
   if (options.print_summary) {
     PrintHeading2("Pose refinement report");
     PrintSolverSummary(summary);
+  }
+
+  // Compute covariance matrices for tvec and qvec
+
+  ceres::Covariance::Options opts;
+  ceres::Covariance covariance(opts);
+    
+  double* qvec_data = qvec->data();
+  double* tvec_data = tvec->data();
+
+  std::vector<std::pair<const double*, const double*>> covariance_blocks;
+  covariance_blocks.push_back(std::make_pair(tvec_data, tvec_data));
+  covariance_blocks.push_back(std::make_pair(qvec_data, qvec_data));
+
+  CHECK(covariance.Compute(covariance_blocks, &problem));
+
+  double tvec_covariance[3 * 3];
+  double qvec_covariance[4 * 4];
+
+  covariance.GetCovarianceBlock(tvec_data, tvec_data, tvec_covariance);
+  covariance.GetCovarianceBlock(qvec_data, qvec_data, qvec_covariance);
+
+  // Compute standard deviation based on covariance matrices and save to file
+
+  std::string delim = ";";
+  std::string file_path = output_path_pose_std + "/pose_std.csv";
+  std::ofstream out_file(file_path, std::ios::app);
+  if (out_file.is_open()) {
+    out_file << image_id_pose_std << delim << sqrt(tvec_covariance[0]) << delim
+             << sqrt(tvec_covariance[4]) << delim << sqrt(tvec_covariance[8])
+             << delim << sqrt(qvec_covariance[0]) << delim
+             << sqrt(qvec_covariance[5]) << delim << sqrt(qvec_covariance[10])
+             << delim << sqrt(qvec_covariance[15]) << "\n";
+    out_file.close();
   }
 
   return summary.IsSolutionUsable();
